@@ -1,0 +1,151 @@
+<html>
+	<head>
+		<meta charset="utf-8"/>
+        <style>
+            @import url('https://fonts.googleapis.com/css2?family=Fira+Sans:ital,wght@0,600;0,800;1,600;1,800&family=Merriweather:ital,wght@0,300;0,700;1,300;1,700&family=Fira+Code:ital,wght@0,400;0,700&display=swap');
+            th{font-weight:unset;text-align:unset}@media print{html{background-color:#FFF !important}a,a:visited{text-decoration:underline}p,img{page-break-inside:avoid !important;break-inside:avoid !important}}html{background-color:#f4f4f4}body{background-color:#FFF;color:#000}strong,b{color:#000}h1,h2,h3,h4,h5,h6{color:#000}blockquote{border-left-color:#f4f4f4}hr,.vscode-dark hr,.vscode-light hr{border-color:#f4f4f4}h1,.vscode-dark h1,.vscode-light h1,h2,.vscode-dark h2,.vscode-light h2{border-bottom-color:#f4f4f4}html{font-size:16px}body{font-family:'Merriweather','Georgia','Times New Roman',serif;font-weight:300;word-spacing:.1em;letter-spacing:0;line-height:150%}body strong,body b{font-weight:700}pre,code{font-family:'Fira Code','Fira Mono','Courier New',monospace;line-height:133%;font-weight:400;word-spacing:0;letter-spacing:0;line-height:inherit;font-size:.880rem}h1,h2,h3,h4,h5,h6{font-family:'Fira Sans','Trebuchet MS','Arial Black','Arial','Helvetica',sans-serif;font-weight:inherit;word-spacing:0;letter-spacing:0;line-height:110%}h1,h2,h3,h4,h5,h6{font-weight:300}h1 strong,h2 strong,h3 strong,h4 strong,h5 strong,h6 strong,h1 b,h2 b,h3 b,h4 b,h5 b,h6 b{font-weight:700}p{font-size:1rem}h1{font-size:2.618rem}h2{font-size:2.058rem}h3{font-size:1.618rem}h4{font-size:1.272rem}h5{font-size:1.000rem}h6{font-size:.786rem}h1>code{font-size:2.058rem}h2>code{font-size:1.618rem}h3>code{font-size:1.272rem}h4>code{font-size:1rem}h5>code{font-size:.786rem}h6>code{font-size:.618rem}html{max-width:100%}body{max-width:64rem;margin:0 auto;padding:1rem 1rem 1rem 1rem;word-wrap:break-word}table{width:100%}p,h1,h2,h3,h4,h5,h6,blockquote,pre,table,ol,ul{margin:1.272rem 0 0 0}li>ul,li>ol{margin-top:0}hr{margin:0}body>*:first-child,body>*:first-child>*:first-child,body>*:first-child>*:first-child>*:first-child,body>*:first-child>*:first-child>*:first-child>*:first-child,body>*:first-child>*:first-child>*:first-child>*:first-child>*:first-child,body>*:first-child>*:first-child>*:first-child>*:first-child>*:first-child>*:first-child,body>*:first-child>*:first-child>*:first-child>*:first-child>*:first-child>*:first-child>*:first-child{margin-top:0}blockquote>*:last-child{margin-bottom:1.272rem}blockquote>*:first-child{margin-top:1.272rem}blockquote{border-left-width:8px;border-left-style:solid;padding:0 1.272rem 0 1.272rem}hr,.vscode-dark hr,.vscode-light hr{height:0;border-width:1px;border-style:solid}h1,h2{border-bottom-width:2px;border-bottom-style:solid}h1{margin-top:2.618rem}h2{margin-top:2.058rem}h3{margin-top:1.618rem}h4{margin-top:1.272rem}h5{margin-top:1.272rem}h6{margin-top:1.272rem}img{display:block;max-width:100%;margin-left:auto;margin-right:auto;page-break-inside:avoid !important;break-inside:avoid !important}
+        </style>
+		<script src="wasm_exec.js"></script>
+		<script>
+			const go = new Go();
+			WebAssembly.instantiateStreaming(fetch("findanagrams.wasm.gz").then(response => new Response(response.body.pipeThrough(new DecompressionStream("gzip")), {headers: {"Content-Type": "application/wasm"}})), go.importObject).then((result) => {
+				go.run(result.instance);
+                document.getElementById('button').disabled = false;
+                document.getElementById('button').innerHTML = 'OK';
+			});
+        </script>
+        <script>
+            var count = 0;
+            function dofind(s, includeWords, excludeWords, minLength, maxLength, minWords, maxWords, stopAfter, locale, part, dict, repeatWords, targetWords, linkToWiktionary) {
+                results = findAnagramsJS(s, includeWords, excludeWords, minLength, maxLength, minWords, maxWords, stopAfter, locale, part, dict, repeatWords, targetWords, linkToWiktionary)
+                rv = ""
+                count = results.length
+                results.forEach(result => { rv = rv + result + '<br>' })
+                return rv
+            }
+
+            function doclick() {
+                s = document.getElementById('words').value
+                locale = 1
+                if (document.getElementById('variants').checked) locale |= (2 + 4 + 8)
+                if (document.getElementById('american').checked) locale |= 16
+                if (document.getElementById('australian').checked) {
+                    locale |= 32
+                    if (document.getElementById('variants').checked) locale |= (64 + 128)
+                }
+                if (document.getElementById('british').checked) {
+                    locale |= 256
+                    if (document.getElementById('variants').checked) locale |= (512 + 1024 + 2048)
+                }
+                if (document.getElementById('canadian').checked) {
+                    locale |= 4096
+                    if (document.getElementById('variants').checked) locale |= (8192 + 16384)
+                }
+                part = 1
+                if (document.getElementById('contractions').checked) part |= 4
+                if (document.getElementById('propernames').checked) part |= (2 + 16)
+                if (document.getElementById('abbreviations').checked) part |= 8
+                dict = 0
+                if (document.getElementById('small').checked) dict |= (1 + 2 + 4)
+                if (document.getElementById('medium').checked) dict |= (8 + 16)
+                if (document.getElementById('large').checked) dict |= (32 + 64 + 128)
+                if (document.getElementById('huge').checked) dict |= 256
+                if (document.getElementById('insane').checked) dict |= 512
+                if (dict == 0) dict = 1
+
+                minLength = Number(document.getElementById('minLength').value)
+                maxLength = Number(document.getElementById('maxLength').value)
+                minWords = Number(document.getElementById('minWords').value)
+                maxWords = Number(document.getElementById('maxWords').value)
+                if (!minLength) minLength = 1
+                if (!maxLength) maxLength = 99
+                if (!minWords) minWords = 1
+                if (!maxWords) maxWords = 99
+
+                repeatWords = document.getElementById('repeatWords').checked
+                targetWords = document.getElementById('targetWords').checked
+                linkToWiktionary = document.getElementById('linkToWiktionary').checked
+                includeWords = document.getElementById('includeWords').value
+                excludeWords = document.getElementById('excludeWords').value
+                stopAfter = Number(document.getElementById('stopAfter').value)
+                if (!stopAfter) stopAfter = -1
+
+                document.getElementById('results').innerHTML = dofind(s, includeWords, excludeWords, minLength, maxLength, minWords, maxWords, stopAfter, locale, part, dict, repeatWords, targetWords, linkToWiktionary)
+                document.getElementById('title').innerHTML = count.toString() + (targetWords ? (count == 1 ? " Target Word:" : " Target Words:") : (count == 1 ? " Anagram:" : " Anagrams:"))
+            }
+        </script>
+	</head>
+	<body>
+        <img src="title.gif"><br>
+        <div>
+            <div style="display:inline-block">
+                Words to anagram:<br>
+                <input id="words" size="35"></input>
+                <button id="button" onclick="doclick()" disabled>(loading)</button>
+                <div style="margin-top: 0.5rem">
+                    Word Length (min, max):
+                    <input id="minLength" value="1" size="1"></input>
+                    <input id="maxLength" value="" size="1"></input>
+                </div>
+            </div>
+            &nbsp;&nbsp;
+            <div style="display:inline-block">
+                Must Include Words:<br>
+                <input id="includeWords" size="35"></input>
+                <div style="margin-top: 0.5rem">
+                    Words in Anagram (min, max):
+                    <input id="minWords" value="1" size="1"></input>
+                    <input id="maxWords" value="" size="1"></input>
+                </div>
+            </div>
+            &nbsp;&nbsp;
+            <div style="display:inline-block">
+                Must Exclude Words:<br>
+                <input id="excludeWords" size="35"></input>
+                <div style="margin-top: 0.5rem">
+                    Number of Anagrams (max):
+                    <input id="stopAfter" value="500" size="3"></input>
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 0.4rem">
+            Words From:
+            <input id="american" type="checkbox" checked>American English</input>&nbsp;&nbsp;&nbsp;
+            <input id="australian" type="checkbox">Australian English</input>&nbsp;&nbsp;&nbsp;
+            <input id="british" type="checkbox">British English</input>&nbsp;&nbsp;&nbsp;
+            <input id="canadian" type="checkbox">Canadian English</input>&nbsp;&nbsp;&nbsp;
+            <input id="variants" type="checkbox">Spelling Variants</input>
+        </div>
+        <div style="margin-top: 0.2rem">
+            Include:
+            <input id="contractions" type="checkbox">Contractions</input>&nbsp;&nbsp;&nbsp;
+            <input id="propernames" type="checkbox">Proper Names</input>&nbsp;&nbsp;&nbsp;
+            <input id="abbreviations" type="checkbox">Abbreviations</input>
+        </div>
+        <div style="margin-top: 0.2rem">
+            Dictionary Size:
+            <input id="small" type="checkbox" checked>Small</input>&nbsp;&nbsp;&nbsp;
+            <input id="medium" type="checkbox">Medium</input>&nbsp;&nbsp;&nbsp;
+            <input id="large" type="checkbox">Large</input>&nbsp;&nbsp;&nbsp;
+            <input id="huge" type="checkbox">Huge</input>&nbsp;&nbsp;&nbsp;
+            <input id="insane" type="checkbox">Insane</input> 
+        </div>
+        <div style="margin-top: 0.2rem">
+            Options:
+            <input id="repeatWords" type="checkbox">OK to Repeat Words</input>&nbsp;&nbsp;&nbsp;
+            <input id="targetWords" type="checkbox">Only Show Target Words</input>&nbsp;&nbsp;&nbsp;
+            <input id="linkToWiktionary" type="checkbox" checked>Link to Wiktionary</input>
+        </div>
+        <div style="margin-top: 1em; margin-bottom: 1em;">
+            <span id="title">Anagrams:</span>
+            <div id="results" style="margin-left: 1em;">
+            </div>
+        </div>  
+        <hr />
+        <div style="margin-top: 0.2em;">&copy; 2024 danpub1, All Rights Reserved. <a href="https://github.com/danpub1/findanagrams">Repository on github</a></div>
+        <div>Words from <a href="http://wordlist.aspell.net">SCOWL</a>, &copy; 2000-2018 Kevin Atkinson et al</div>
+        <div>Title Generated by (and pretty much everything else inspired by) the <a href="https://wordsmith.org/anagram/">Internet Anagram Server</a></div>
+    </body>
+</html>
+
+
