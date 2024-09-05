@@ -1,5 +1,9 @@
 # findanagrams
 
+[https://danpub1.github.io/findanagrams](https://danpub1.github.io/findanagrams)
+
 An anagram generator in go.  Compiles to cli & web / wasm.
 
-[https://danpub1.github.io/findanagrams](https://danpub1.github.io/findanagrams)
+### TODO
+
+Excluding multiple words doesn't apparently count towards the word limit correctly.
